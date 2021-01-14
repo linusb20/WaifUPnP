@@ -157,7 +157,7 @@ class Gateway {
 	}
     }
 
-    public boolean openPort(int port, String protocol, int leaseDuration) {
+    public boolean openPort(int port, String protocol, int leaseDuration, String description) {
 	if (port < 0 || port > 65535) {
 	    throw new IllegalArgumentException("Invalid port");
 	}
@@ -168,7 +168,7 @@ class Gateway {
 	params.put("NewExternalPort", "" + port);
 	params.put("NewInternalPort", "" + port);
 	params.put("NewEnabled", "1");
-	params.put("NewPortMappingDescription", "Saros Socks5 TCP");
+	params.put("NewPortMappingDescription", description);
 	params.put("NewLeaseDuration", String.valueOf(leaseDuration));
 	try {
 	    Map<String, String> r = command("AddPortMapping", params);

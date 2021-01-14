@@ -103,12 +103,12 @@ public class UPnP {
      * @param leaseDuration amount of seconds this mapping is valid. Use 0 for unlimited duration.
      * @return true if the operation was successful, false otherwise
      */
-    public static boolean mapPort(int port, final String protocol, int leaseDuration) {
+    public static boolean mapPort(int port, final String protocol, int leaseDuration, String description) {
 	if(!isUPnPAvailable()) return false;
 	if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
 	    return false;
 	}
-	return defaultGW.openPort(port, protocol, leaseDuration);
+	return defaultGW.openPort(port, protocol, leaseDuration, description);
     }
 
 
