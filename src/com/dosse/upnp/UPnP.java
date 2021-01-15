@@ -91,7 +91,7 @@ public class UPnP {
 	return defaultGW.getGatewayDeviceID();
     }
 
-    public int getMappingErrCode() {
+    public static int getMappingErrCode() {
 	return defaultGW.getMappingErrCode();
     }
 
