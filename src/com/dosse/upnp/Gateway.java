@@ -19,12 +19,17 @@
 package com.dosse.upnp;
 
 import java.net.HttpURLConnection;
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,15 +41,32 @@ import org.w3c.dom.traversal.NodeIterator;
  *
  * @author Federico
  */
-class Gateway {
+public class Gateway {
 
-    private Inet4Address iface;
-
-    private String serviceType = null, controlURL = null, gatewayDeviceID = null;
+    private String serviceType = null, controlURL = null;
+    private String usn;
+    private String friendlyName;
+    private InetAddress localAddress;
+    private InetAddress deviceAddress;
     private int mappingErrCode = 0;
 
-    public Gateway(byte[] data, Inet4Address ip) throws Exception {
-	iface = ip;
+
+    // Only for debugging purposes. Can be removed later
+    private static void printXML(Document d) {
+	TransformerFactory tf = TransformerFactory.newInstance();
+	Transformer transformer;
+	try {
+	    transformer = tf.newTransformer();
+	    StringWriter writer = new StringWriter();
+	    transformer.transform(new DOMSource(d), new StreamResult(writer));
+	    String xmlString = writer.getBuffer().toString();
+	    System.out.println(xmlString);
+	} catch (Exception e) {}
+    }
+
+    public Gateway(byte[] data, InetAddress ip, InetAddress devAddr) throws Exception {
+	localAddress = ip;
+	deviceAddress = devAddr;
 	String location = null;
 	StringTokenizer st = new StringTokenizer(new String(data), "\n");
 	while (st.hasMoreTokens()) {
@@ -57,7 +79,7 @@ class Gateway {
 		location = val;  // location = URL for UPnP description for root device
 	    }
 	    if (name.equalsIgnoreCase("usn")) {
-		gatewayDeviceID = val;  // gatewayDeviceID = USN of device, val could be null
+		usn = val;  // gatewayDeviceID = USN of device, val could be null
 	    }
 
 	}
@@ -66,6 +88,9 @@ class Gateway {
 	}
 	Document d;
 	d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(location);
+	// printXML(d);
+	NodeList friendlyName = d.getElementsByTagName("friendlyName");
+	this.friendlyName = friendlyName.item(0).getTextContent();
 	NodeList services = d.getElementsByTagName("service");
 	for (int i = 0; i < services.getLength(); i++) {
 	    Node service = services.item(i);
@@ -136,16 +161,38 @@ class Gateway {
 	return ret;
     }
 
-    public String getGatewayDeviceID() {
-	return gatewayDeviceID;
-    }
-
     public int getMappingErrCode() {
 	return mappingErrCode;
     }
 
-    public String getLocalIP() {
-	return iface.getHostAddress();
+    public InetAddress getLocalAddress() {
+	return localAddress;
+    }
+
+    public InetAddress getDeviceAddress() {
+	return deviceAddress;
+    }
+
+    public String getFriendlyName() {
+	return friendlyName;
+    }
+
+    public String getUSN() {
+	return usn;
+    }
+
+    public boolean isConnected() {
+	try {
+	    Map<String, String> r = command("GetStatusInfo", null);
+	    String connectionStatus = r.get("NewConnectionStatus");
+	    if (connectionStatus != null
+		&& connectionStatus.equalsIgnoreCase("Connected")) {
+		return true;
+	    }
+	    return false;
+	} catch (Throwable t) {
+	    return false;
+	}
     }
 
     public String getExternalIP() {
@@ -164,7 +211,7 @@ class Gateway {
 	Map<String, String> params = new HashMap<String, String>();
 	params.put("NewRemoteHost", "");
 	params.put("NewProtocol", protocol);
-	params.put("NewInternalClient", iface.getHostAddress());
+	params.put("NewInternalClient", localAddress.getHostAddress());
 	params.put("NewExternalPort", "" + port);
 	params.put("NewInternalPort", "" + port);
 	params.put("NewEnabled", "1");

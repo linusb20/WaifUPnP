@@ -9,10 +9,11 @@ public class Main {
 	// UPnP.setGatewayByID(USN);
 	// System.out.println(UPnP.getGatewayDeviceID().equals(USN));
 	// System.out.println(UPnP.isUPnPAvailable());
+
 	boolean success = UPnP.mapPort(4137, "TCP", 0, PORT_MAPPING_DESCRIPTION);
 	System.out.println("mapPort: " + success);
 	try {
-		Thread.sleep(10000);
+		Thread.sleep(2000);
 	} catch (InterruptedException ex) {}
 	success = UPnP.isMapped(4137, "TCP");
 	System.out.println("isMapped: " + success);
@@ -21,7 +22,10 @@ public class Main {
 	success = UPnP.isMapped(4137, "TCP");
 	System.out.println("isMapped: " + success);
 
-	System.out.println(UPnP.getExternalIP());
-	System.out.println(UPnP.getLocalIP());
+	System.out.println(UPnP.getDeviceAddress());
+	System.out.println(UPnP.getLocalAddress());
+	System.out.println(UPnP.getExternalIPAddress());
+	System.out.println(UPnP.getFriendlyName());
+	System.out.println(UPnP.getGatewayDeviceID());
     }
 }

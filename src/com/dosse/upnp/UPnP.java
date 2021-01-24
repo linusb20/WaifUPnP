@@ -18,6 +18,7 @@
  */
 package com.dosse.upnp;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -43,7 +44,6 @@ public class UPnP {
 	}
     };
 
-
     /**
       * Sets the gateway to use for port mapping
       *
@@ -53,7 +53,7 @@ public class UPnP {
     public static boolean setGatewayByID(String usn) {
 	waitInit();
 	for (Gateway gw : gateways) {
-	    if (gw.getGatewayDeviceID().equals(usn)) {
+	    if (gw.getUSN().equals(usn)) {
 		defaultGW = gw;
 		return true;
 	    }
@@ -84,15 +84,6 @@ public class UPnP {
 	    } catch (InterruptedException ex) {
 	    }
 	}
-    }
-
-    public static String getGatewayDeviceID() {
-	if(!isUPnPAvailable()) return null;
-	return defaultGW.getGatewayDeviceID();
-    }
-
-    public static int getMappingErrCode() {
-	return defaultGW.getMappingErrCode();
     }
 
     /**
@@ -149,11 +140,39 @@ public class UPnP {
      *
      * @return external IP address as string, or null if not available
      */
-    public static String getExternalIP(){
+    public static String getExternalIPAddress(){
 	if(!isUPnPAvailable()) return null;
 	return defaultGW.getExternalIP();
     }
 
+    public static InetAddress getDeviceAddress(){
+	if(!isUPnPAvailable()) return null;
+	return defaultGW.getDeviceAddress();
+    }
+
+    public static InetAddress getLocalAddress(){
+	if(!isUPnPAvailable()) return null;
+	return defaultGW.getLocalAddress();
+    }
+
+    public static String getFriendlyName(){
+	if(!isUPnPAvailable()) return null;
+	return defaultGW.getFriendlyName();
+    }
+
+    public static String getGatewayDeviceID() {
+	if(!isUPnPAvailable()) return null;
+	return defaultGW.getUSN();
+    }
+
+    public static int getMappingErrCode() {
+	return defaultGW.getMappingErrCode();
+    }
+
+    public boolean isConnected() {
+	if(!isUPnPAvailable()) return false;
+	return defaultGW.isConnected();
+    }
 
     /**
      * Gets the internal IP address of this machine
@@ -162,7 +181,7 @@ public class UPnP {
      */
     public static String getLocalIP(){
 	if(!isUPnPAvailable()) return null;
-	return defaultGW.getLocalIP();
+	return defaultGW.getLocalAddress().getHostAddress();
     }
 
 }
