@@ -108,31 +108,31 @@ public class GatewayFinder {
     }
 
     private static Inet4Address[] getLocalIPs() {
-	LinkedList<Inet4Address> ret = new LinkedList<Inet4Address>();
-	try {
-	    Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-	    while (ifaces.hasMoreElements()) {
-		try {
-		    NetworkInterface iface = ifaces.nextElement();
-		    if (!iface.isUp() || iface.isLoopback() || iface.isVirtual() || iface.isPointToPoint()) {
-			continue;
-		    }
-		    Enumeration<InetAddress> addrs = iface.getInetAddresses();
-		    if (addrs == null) {
-			continue;
-		    }
-		    while (addrs.hasMoreElements()) {
-			InetAddress addr = addrs.nextElement();
-			if (addr instanceof Inet4Address) {
-			    ret.add((Inet4Address) addr);
-			}
-		    }
-		} catch (Throwable t) {
-		}
-	    }
-	} catch (Throwable t) {
-	}
-	return ret.toArray(new Inet4Address[]{});
+        LinkedList<Inet4Address> ret = new LinkedList<Inet4Address>();
+        try {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            while (ifaces.hasMoreElements()) {
+                try {
+                    NetworkInterface iface = ifaces.nextElement();
+                    if (!iface.isUp() || iface.isLoopback() || iface.isVirtual() || iface.isPointToPoint()) {
+                        continue;
+                    }
+                    Enumeration<InetAddress> addrs = iface.getInetAddresses();
+                    if (addrs == null) {
+                        continue;
+                    }
+                    while (addrs.hasMoreElements()) {
+                        InetAddress addr = addrs.nextElement();
+                        if (addr instanceof Inet4Address) {
+                            ret.add((Inet4Address) addr);
+                        }
+                    }
+                } catch (Throwable t) {
+                }
+            }
+        } catch (Throwable t) {
+        }
+        return ret.toArray(new Inet4Address[]{});
     }
 
 }

@@ -144,27 +144,27 @@ public class Gateway {
     }
 
     public InetAddress getLocalAddress() {
-	return localAddress;
+	    return localAddress;
     }
 
     public InetAddress getDeviceAddress() {
-	return deviceAddress;
+	    return deviceAddress;
     }
 
     public void setLocalAddress(InetAddress localAddress) {
-	this.localAddress = localAddress;
+	    this.localAddress = localAddress;
     }
 
     public void setDeviceAddress(InetAddress deviceAddress) {
-	this.deviceAddress = deviceAddress;
+	    this.deviceAddress = deviceAddress;
     }
 
     public String getFriendlyName() {
-	return friendlyName;
+	    return friendlyName;
     }
 
     public String getUSN() {
-	return usn;
+	    return usn;
     }
 
     public boolean isConnected() {
@@ -191,70 +191,69 @@ public class Gateway {
     }
 
     public int openPort(int port, String protocol, int leaseDuration, String description) {
-	if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
-	    return -1;
-	}
-	if (port < 0 || port > 65535) {
-	    throw new IllegalArgumentException("Invalid port");
-	}
-	Map<String, String> params = new HashMap<String, String>();
-	params.put("NewRemoteHost", "");
-	params.put("NewProtocol", protocol);
-	params.put("NewInternalClient", localAddress.getHostAddress());
-	params.put("NewExternalPort", "" + port);
-	params.put("NewInternalPort", "" + port);
-	params.put("NewEnabled", "1");
-	params.put("NewPortMappingDescription", description);
-	params.put("NewLeaseDuration", String.valueOf(leaseDuration));
-	try {
-	    Map<String, String> r = command("AddPortMapping", params);
-	    if (r.get("errorCode") == null) return 0;
-	    return Integer.parseInt(r.get("errorCode"));
-	} catch (Exception ex) {
-        System.out.println(ex);
-	    return -1;
-	}
+        if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
+            return -1;
+        }
+        if (port < 0 || port > 65535) {
+            throw new IllegalArgumentException("Invalid port");
+        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("NewRemoteHost", "");
+        params.put("NewProtocol", protocol);
+        params.put("NewInternalClient", localAddress.getHostAddress());
+        params.put("NewExternalPort", "" + port);
+        params.put("NewInternalPort", "" + port);
+        params.put("NewEnabled", "1");
+        params.put("NewPortMappingDescription", description);
+        params.put("NewLeaseDuration", String.valueOf(leaseDuration));
+        try {
+            Map<String, String> r = command("AddPortMapping", params);
+            if (r.get("errorCode") == null) return 0;
+            return Integer.parseInt(r.get("errorCode"));
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     public boolean closePort(int port, String protocol) {
-	if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
-	    return false;
-	}
-	if (port < 0 || port > 65535) {
-	    throw new IllegalArgumentException("Invalid port");
-	}
-	Map<String, String> params = new HashMap<String, String>();
-	params.put("NewRemoteHost", "");
-	params.put("NewProtocol", protocol);
-	params.put("NewExternalPort", "" + port);
-	try {
-	    command("DeletePortMapping", params);
-	    return true;
-	} catch (Exception ex) {
-	    return false;
-	}
+        if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
+            return false;
+        }
+        if (port < 0 || port > 65535) {
+            throw new IllegalArgumentException("Invalid port");
+        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("NewRemoteHost", "");
+        params.put("NewProtocol", protocol);
+        params.put("NewExternalPort", "" + port);
+        try {
+            command("DeletePortMapping", params);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public boolean isMapped(int port, String protocol) {
-	if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
-	    return false;
-	}
-	if (port < 0 || port > 65535) {
-	    throw new IllegalArgumentException("Invalid port");
-	}
-	Map<String, String> params = new HashMap<String, String>();
-	params.put("NewRemoteHost", "");
-	params.put("NewProtocol", protocol);
-	params.put("NewExternalPort", "" + port);
-	try {
-	    Map<String, String> r = command("GetSpecificPortMappingEntry", params);
-	    if (r.get("errorCode") != null) {
-		throw new Exception();
-	    }
-	    return r.get("NewInternalPort") != null;
-	} catch (Exception ex) {
-	    return false;
-	}
+        if (!protocol.equals("UDP") && !protocol.equals("TCP")) {
+            return false;
+        }
+        if (port < 0 || port > 65535) {
+            throw new IllegalArgumentException("Invalid port");
+        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("NewRemoteHost", "");
+        params.put("NewProtocol", protocol);
+        params.put("NewExternalPort", "" + port);
+        try {
+            Map<String, String> r = command("GetSpecificPortMappingEntry", params);
+            if (r.get("errorCode") != null) {
+                throw new Exception();
+            }
+            return r.get("NewInternalPort") != null;
+        } catch (Exception ex) {
+            return false;
+        }
 
     }
 
