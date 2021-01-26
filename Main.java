@@ -24,6 +24,8 @@ public class Main {
 
         boolean success = gw.isMapped(4137, "TCP");
         System.out.println("isMapped: " + success);
+        success = gw.isConnected();
+        System.out.println("isConnected: " + success);
         success = gw.closePort(4137, "TCP");
         System.out.println("closePort: " + success);
         success = gw.isMapped(4137, "TCP");
