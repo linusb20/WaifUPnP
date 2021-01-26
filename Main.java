@@ -1,31 +1,38 @@
-import com.dosse.upnp.UPnP;
+import com.dosse.upnp.Gateway;
+import com.dosse.upnp.GatewayFinder;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
 
-    private static String USN = "";
     private static String PORT_MAPPING_DESCRIPTION = "Saros Socks5 TCP";
 
     public static void main(String args[]){
-	// UPnP.setGatewayByID(USN);
-	// System.out.println(UPnP.getGatewayDeviceID().equals(USN));
-	// System.out.println(UPnP.isUPnPAvailable());
+        List<Gateway> devices = new ArrayList<Gateway>();
+        GatewayFinder finder = new GatewayFinder();
+        devices = finder.discoverGateways();
+        if (devices.isEmpty()) {
+            System.out.println("No gateways found!");
+            return;
+        }
+        Gateway gw = devices.get(0);
+        int errCode = gw.openPort(4137, "TCP", 0, PORT_MAPPING_DESCRIPTION);
+        System.out.println("mapPort: " + (errCode == 0)); 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {}
 
-	boolean success = UPnP.mapPort(4137, "TCP", 0, PORT_MAPPING_DESCRIPTION);
-	System.out.println("mapPort: " + success);
-	try {
-		Thread.sleep(2000);
-	} catch (InterruptedException ex) {}
-	success = UPnP.isMapped(4137, "TCP");
-	System.out.println("isMapped: " + success);
-	success = UPnP.closePort(4137, "TCP");
-	System.out.println("closePort: " + success);
-	success = UPnP.isMapped(4137, "TCP");
-	System.out.println("isMapped: " + success);
+        boolean success = gw.isMapped(4137, "TCP");
+        System.out.println("isMapped: " + success);
+        success = gw.closePort(4137, "TCP");
+        System.out.println("closePort: " + success);
+        success = gw.isMapped(4137, "TCP");
+        System.out.println("isMapped: " + success);
 
-	System.out.println(UPnP.getDeviceAddress());
-	System.out.println(UPnP.getLocalAddress());
-	System.out.println(UPnP.getExternalIPAddress());
-	System.out.println(UPnP.getFriendlyName());
-	System.out.println(UPnP.getGatewayDeviceID());
+        System.out.println("Device Address: " + gw.getDeviceAddress());
+        System.out.println("LocalAddress: " + gw.getLocalAddress());
+        System.out.println("External IP Address: " + gw.getExternalIP());
+        System.out.println("Friendly Name: " + gw.getFriendlyName());
+        System.out.println("USN: " + gw.getUSN());
     }
 }
